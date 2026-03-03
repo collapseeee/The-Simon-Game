@@ -3,13 +3,15 @@ var gamePattern = []; // 2.5
 const buttonColours = ["red", "blue", "green", "yellow"]; // 2.3
 var started = false; // 7.1
 var level = 0; // 7.2
+var timer; // spamming and skipping 1 level fix.
 
 $(document).keypress(function (e) { // 7
   if (started == false) {
+    $("#level-title").text("Level " + level);
     console.log("Game started.")
     nextSequence();
+    started = true;
   }
-  started = true;
 });
 
 $(document).ready(function() {
@@ -27,7 +29,7 @@ $(document).ready(function() {
 function checkAnswer(currentLevel) { // 8
   if (gamePattern[currentLevel] == userClickedPattern[currentLevel]) {
     if (gamePattern.length == userClickedPattern.length) {
-      setTimeout(() => {{
+      timer = setTimeout(() => {{
         nextSequence();
       }}, 1000);
     };
@@ -37,6 +39,7 @@ function checkAnswer(currentLevel) { // 8
 };
 
 function nextSequence() { // 2
+  level++;
   console.log("Current Level: " + level);
   userClickedPattern = [];
   var randomNumber = Math.floor(Math.random() * 4); // 2.2
@@ -44,12 +47,12 @@ function nextSequence() { // 2
   playSound(randomChosenColour); // 5.3
   flashElement(randomChosenColour);
   gamePattern.push(randomChosenColour); // 2.6
-  $("#level-title").text("Level " + level++); // 7.3
+  $("#level-title").text("Level " + level); // 7.3
   //console.log(gamePattern); // for debugging.
 }
 
 function flashElement(colour) { // 3.2
-  $("#" + colour).fadeOut(150).fadeIn(150);
+  $("#" + colour).fadeIn(100).fadeOut(100).fadeIn(100);
 }
 
 function animatePress(currentColour) { // 6
@@ -65,14 +68,15 @@ function playSound(name) { // 3 & 5
 };
 
 function startOver() {
+  clearTimeout(timer);
   playSound("wrong");
   $("body").addClass("game-over");
   $("#level-title").text("Game Over, Press Any Key to Restart");
+  setTimeout(() => {
+    $("body").removeClass("game-over");
+  }, 200);
   gamePattern = [];
   userClickedPattern = [];
   started = false;
   level = 0;
-  setTimeout(() => {
-    $("body").removeClass("game-over");
-  }, 200);
 };
